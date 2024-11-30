@@ -9,17 +9,33 @@ import plotly.express as px
 def main():
     filename_colors = "resources/colors.json"
     filename_ejcs = "resources/list_of_ejcs.csv"
+    width_px = 1000
+    height_px = 800
 
     colors = _read_colors(filename=filename_colors)
     df_ejcs = prepare_ejcs(filename=filename_ejcs, colors=colors)
     fig = create_map(df_ejcs=df_ejcs)
-    create_output(fig=fig, output_folder="output", show_figure=True, save_figure=True)
+    create_output(
+        fig=fig,
+        width=width_px,
+        height=height_px,
+        output_folder="output",
+        show_figure=True,
+        save_figure=True,
+    )
 
 
 def create_output(
-    fig: go.Figure, output_folder: str, show_figure: bool, save_figure: bool
+    fig: go.Figure,
+    width: int,
+    height: int,
+    output_folder: str,
+    show_figure: bool,
+    save_figure: bool,
 ) -> None:
     config = {"displayModeBar": False}
+
+    fig.update_layout(width=width, height=height)
 
     if show_figure:
         fig.show(config=config)
@@ -31,10 +47,15 @@ def create_output(
             include_plotlyjs="cdn",
             config=config,
         )
+        fig.write_html(
+            f"index.html",
+            include_plotlyjs="cdn",
+            config=config,
+        )
         fig.write_image(
             f"{output_folder}/{filename}.webp",
-            width=1200,
-            height=800,
+            width=width,
+            height=height,
             scale=1.0,
         )
 
@@ -76,8 +97,6 @@ def create_map(df_ejcs: pd.DataFrame) -> go.Figure:
     fig.update_layout(
         showlegend=False,
         margin=dict(l=0, r=0, t=0, b=0),
-        height=800,
-        width=1200,
         hoverlabel=dict(font=dict(size=20)),
     )
 
